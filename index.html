@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Верно / Не верно: Состав населения Казахстана (XVIII–XX вв.)</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Установка шрифта Inter для современного вида */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fef3c7; /* Светло-желтый фон (amber-100) */
+            color: #064e3b; /* Темно-зеленый текст (emerald-900) */
+        }
+        .card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #ecfdf5; /* Очень светлый зеленый (emerald-50) */
+            border: 2px solid #34d399; /* Средний зеленый (emerald-400) */
+        }
+        .btn {
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="min-h-screen flex items-center justify-center p-4">
+        <div class="card w-full max-w-lg rounded-xl p-6 md:p-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-[#d97706] mb-4">
+                Тест: Изменение состава населения Казахстана
+            </h1>
+            <p id="grade-level" class="text-lg mb-6 text-[#10b981]">
+                Тема для 11 класса (XVIII – начало XX века)
+            </p>
+
+            <!-- Блок вопросов -->
+            <div id="quiz-container">
+                <p id="question-number" class="text-xl font-bold mb-3 text-[#f59e0b]"></p>
+                <div class="bg-white p-5 rounded-lg mb-6 border-l-4 border-[#34d399] min-h-[100px] flex items-center justify-center">
+                    <p id="question-text" class="text-lg font-medium text-gray-800">
+                        <!-- Текст вопроса появится здесь -->
+                    </p>
+                </div>
+                
+                <!-- Кнопки ответов -->
+                <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                    <button id="true-btn" data-answer="true" class="btn flex-1 py-3 rounded-lg bg-[#10b981] text-white hover:bg-[#059669] shadow-md">
+                        <span class="text-2xl mr-2">✅</span> Верно
+                    </button>
+                    <button id="false-btn" data-answer="false" class="btn flex-1 py-3 rounded-lg bg-[#f59e0b] text-white hover:bg-[#d97706] shadow-md">
+                        <span class="text-2xl mr-2">❌</span> Не верно
+                    </button>
+                </div>
+
+                <!-- Сообщение об обратной связи -->
+                <p id="feedback" class="mt-4 text-center font-medium min-h-[20px]"></p>
+            </div>
+
+            <!-- Блок результатов (скрыт по умолчанию) -->
+            <div id="results-container" class="hidden">
+                <h2 class="text-3xl font-bold text-[#d97706] mb-4">
+                    Результаты теста
+                </h2>
+                <p class="text-2xl mb-6">
+                    Ваш результат: <span id="final-score" class="font-extrabold text-[#10b981]"></span>
+                </p>
+                <p id="score-message" class="text-lg mb-6"></p>
+
+                <button id="restart-btn" class="btn w-full py-3 rounded-lg bg-[#34d399] text-white hover:bg-[#059669] shadow-md">
+                    Начать заново
+                </button>
+            </div>
+
+            <!-- Счетчик счета -->
+            <div class="mt-6 text-xl font-medium">
+                Счет: <span id="score-display" class="font-extrabold text-[#f59e0b]">0</span> / 
+                <span id="total-questions-display" class="font-extrabold text-gray-600">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Игровая логика
+        const questions = [
+            {
+                text: "До середины XIX века этнический состав населения Казахстана оставался строго моноэтническим (казахским) и не подвергался значительным изменениям.",
+                answer: false,
+                explanation: "Не верно. Изменения начались уже в XVIII веке с вхождением частей жузов в состав Российской империи и строительством крепостей, что привело к появлению русского и других этносов."
+            },
+            {
+                text: "Основной причиной массового изменения этнического состава в XIX — начале XX века стала аграрная политика Российской империи, направленная на переселение крестьян.",
+                answer: true,
+                explanation: "Верно. Столыпинская аграрная реформа и предшествующие ей переселенческие меры стали ключевым фактором, привлекавшим миллионы крестьян из европейской части империи."
+            },
+            {
+                text: "Массовое переселение крестьян в Семиречье и Сырдарьинскую область было незначительным, так как эти территории были малопригодны для земледелия.",
+                answer: false,
+                explanation: "Не верно. Напротив, Семиречье стало одним из ключевых районов переселения. Также активное переселение шло в Северный, Восточный и Центральный Казахстан."
+            },
+            {
+                text: "Строительство Транссибирской железной дороги в конце XIX века не оказало существенного влияния на темпы миграции в северные регионы Казахстана.",
+                answer: false,
+                explanation: "Не верно. Строительство железных дорог (в том числе и Транссибирской, которая проходила близко) и связанных с ними городов значительно упростило и ускорило процесс переселения."
+            },
+            {
+                text: "К началу XX века доля некоренного (неказахского) населения в некоторых северных и восточных уездах Казахстана превысила долю казахского населения.",
+                answer: true,
+                explanation: "Верно. В результате массового переселения в ряде наиболее освоенных для земледелия регионов Севера и Востока Казахстана произошел численный перевес некоренного населения."
+            },
+            // --- Добавлены новые вопросы (5-10) ---
+            {
+                text: "Основным миграционным потоком в Казахстан в XVIII веке были китайцы из Синьцзяна.",
+                answer: false,
+                explanation: "Не верно. В XVIII веке основными миграционными потоками были русские и украинцы, связанные с военной колонизацией и строительством укреплений (например, Оренбургская линия)."
+            },
+            {
+                text: "Политика «Земельного закона» 1868 года способствовала ограничению прав казахов на кочевание и изъятию земель, что ускорило изменение этнического состава.",
+                answer: true,
+                explanation: "Верно. Этот закон позволил государству объявлять «излишки» казахских земель государственным фондом для последующего переселения крестьян."
+            },
+            {
+                text: "Значительное количество татар, уйгуров и дунган переселилось в Семиречье в результате конфликтов в соседнем Китае (Синьцзян) во второй половине XIX века.",
+                answer: true,
+                explanation: "Верно. События, такие как восстание в Илийском крае (1864–1881), привели к притоку значительного количества этих народов в Семиречье."
+            },
+            {
+                text: "Переселенцы из европейской части империи селились исключительно в городах и не занимались земледелием, что минимизировало конфликты с казахским населением.",
+                answer: false,
+                explanation: "Не верно. Большинство переселенцев были крестьянами и активно занимались земледелием в степных районах, что привело к земельному дефициту и многочисленным конфликтам с кочевым казахским населением."
+            },
+            {
+                text: "В начале XX века казахская интеллигенция, в частности, деятели движения Алаш, активно выступали против переселенческой политики, видя в ней угрозу для будущего казахской нации.",
+                answer: true,
+                explanation: "Верно. Лидеры Алаш-Орды, такие как А. Бокейханов и А. Байтурсынов, критиковали переселенческую политику и боролись за земельные права казахского народа."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let waitingForNext = false; // Флаг для предотвращения двойных кликов
+
+        // DOM элементы
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const trueBtn = document.getElementById('true-btn');
+        const falseBtn = document.getElementById('false-btn');
+        const feedbackEl = document.getElementById('feedback');
+        const scoreDisplay = document.getElementById('score-display');
+        const totalQuestionsDisplay = document.getElementById('total-questions-display');
+        const finalScoreEl = document.getElementById('final-score');
+        const scoreMessageEl = document.getElementById('score-message');
+        const restartBtn = document.getElementById('restart-btn');
+
+        // Установить общее количество вопросов
+        totalQuestionsDisplay.textContent = questions.length;
+
+        /**
+         * Отображает текущий вопрос.
+         */
+        function displayQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const q = questions[currentQuestionIndex];
+                questionNumberEl.textContent = `Вопрос ${currentQuestionIndex + 1} из ${questions.length}`;
+                questionTextEl.textContent = q.text;
+                
+                // Сброс состояния кнопок и обратной связи
+                feedbackEl.textContent = '';
+                trueBtn.disabled = false;
+                falseBtn.disabled = false;
+                trueBtn.classList.remove('opacity-50', 'bg-[#059669]', 'bg-red-600');
+                falseBtn.classList.remove('opacity-50', 'bg-[#059669]', 'bg-red-600');
+                trueBtn.classList.add('bg-[#10b981]');
+                falseBtn.classList.add('bg-[#f59e0b]');
+                waitingForNext = false;
+            } else {
+                showResults();
+            }
+        }
+
+        /**
+         * Обрабатывает ответ пользователя.
+         * @param {boolean} userAnswer - Ответ пользователя (true/false).
+         */
+        function handleAnswer(userAnswer) {
+            if (waitingForNext) return;
+            waitingForNext = true;
+
+            const q = questions[currentQuestionIndex];
+            const isCorrect = userAnswer === q.answer;
+            const selectedBtn = userAnswer ? trueBtn : falseBtn;
+            const otherBtn = userAnswer ? falseBtn : trueBtn;
+
+            // Отключение кнопок
+            trueBtn.disabled = true;
+            falseBtn.disabled = true;
+
+            // Смена цвета в зависимости от правильности
+            if (isCorrect) {
+                score++;
+                feedbackEl.innerHTML = `<span class="text-[#059669] font-bold">Верно!</span> ${q.explanation}`;
+                selectedBtn.classList.remove('bg-[#10b981]', 'bg-[#f59e0b]');
+                selectedBtn.classList.add('bg-[#059669]'); // Темно-зеленый для правильного
+            } else {
+                feedbackEl.innerHTML = `<span class="text-red-600 font-bold">Ошибка.</span> ${q.explanation}`;
+                selectedBtn.classList.remove('bg-[#10b981]', 'bg-[#f59e0b]');
+                selectedBtn.classList.add('bg-red-600'); // Красный для неправильного
+                
+                // Показать правильный ответ
+                if (q.answer) {
+                    trueBtn.classList.remove('bg-[#10b981]');
+                    trueBtn.classList.add('bg-[#059669]', 'shadow-lg');
+                } else {
+                    falseBtn.classList.remove('bg-[#f59e0b]');
+                    falseBtn.classList.add('bg-[#059669]', 'shadow-lg');
+                }
+            }
+            
+            // Обновить счетчик
+            scoreDisplay.textContent = score;
+
+            // Задержка перед переходом к следующему вопросу
+            setTimeout(() => {
+                currentQuestionIndex++;
+                displayQuestion();
+            }, 3000);
+        }
+
+        /**
+         * Отображает итоговые результаты.
+         */
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            finalScoreEl.textContent = `${score} из ${questions.length}`;
+
+            let message = "";
+            const percentage = (score / questions.length) * 100;
+
+            if (percentage === 100) {
+                message = "Отлично! Вы продемонстрировали глубокое знание темы.";
+            } else if (percentage >= 75) {
+                message = "Очень хорошо! У вас сильная база знаний по теме.";
+            } else if (percentage >= 50) {
+                message = "Неплохо. Большинство ответов верны, но есть над чем поработать.";
+            } else {
+                message = "Рекомендуем внимательнее изучить материалы по переселенческой политике XVIII – начала XX века.";
+            }
+            scoreMessageEl.textContent = message;
+        }
+
+        /**
+         * Сбрасывает игру до начального состояния.
+         */
+        function restartGame() {
+            currentQuestionIndex = 0;
+            score = 0;
+            scoreDisplay.textContent = 0;
+            
+            resultsContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            
+            displayQuestion();
+        }
+
+        // --- Обработчики событий ---
+        trueBtn.addEventListener('click', () => handleAnswer(true));
+        falseBtn.addEventListener('click', () => handleAnswer(false));
+        restartBtn.addEventListener('click', restartGame);
+
+        // Инициализация игры при загрузке
+        window.onload = displayQuestion;
+
+    </script>
+
+</body>
+</html>
